@@ -18,6 +18,7 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+import heapq
 from game import Directions
 from typing import List
 
@@ -68,7 +69,7 @@ class SearchProblem:
 
 def tinyMazeSearch(problem: SearchProblem) -> List[Directions]:
     """
-    Returns a sequence of moves that solves tinyMaze.  For any other maze, the
+    Returns a sequence of moves that solves tinyMaze.  For any o444ther maze, the
     sequence of moves will be incorrect, so only use this for tinyMaze.
     """
     s = Directions.SOUTH
@@ -111,8 +112,47 @@ def nullHeuristic(state, problem=None) -> float:
 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    # Gets inital state and sets the fringe to be empty
+    initialState = problem.getStartState()
+    fringe = []
+
+    # uses the heuristic function and gets an f(n) = priority. Then it pushes that f(n) + initialState and empty set which represents the actions to the fringe. 
+    priority = heuristic(initialState, problem)
+    heapq.heappush(fringe, (priority, initialState, []))
+
+    # Makes a dictionary of all the costs to keep in the memory for later
+    bestG = {initialState : 0}
+
+    #While fringe is not empty
+    while (fringe):
+        #Strips the first priority node into the f(n), state, and the actions
+        priority, state, actions = heapq.heappop(fringe)
+    
+        if problem.isGoalState(state):
+            return actions #DONE!
+        
+        # Calculates the current G(n)
+        newG = problem.getCostOfActions(actions)
+
+        #Gets all the children and calculates the new G() by adding the current g(n) and the cost to get to it.
+        for successorState, action, cost in problem.getSuccessors(state):
+            successorG = newG + cost
+
+            #if the child's g(n) is less than the best g(n), then add it to the dictionary and add the action to the actions list so you know where you have went. 
+            if successorG < bestG.get(successorState, float("inf")):
+                bestG[successorState] = successorG
+                newActions = actions + [action]
+
+                # priority = f(n) and push everything to the fringe for later
+                priority = successorG + heuristic(successorState, problem)
+                heapq.heappush(fringe, (priority, successorState, newActions))
+    return []
+
+        
+
+
+
 
 # Abbreviations
 bfs = breadthFirstSearch
