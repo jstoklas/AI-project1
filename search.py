@@ -128,7 +128,6 @@ def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
             if successor not in visited:
                 visited.add(successor)
                 queue.push((successor, path +[action]))
-                visited.add(successor)
     return []
     util.raiseNotDefined()
 
