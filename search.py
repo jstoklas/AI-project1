@@ -116,8 +116,7 @@ def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     queue = util.Queue()
     start = problem.getStartState()
     queue.push((start,[]))
-    visited = set()
-    visited.add(start)
+    visited = set([start])
 
     while not queue.isEmpty():
         state, path  = queue.pop()
@@ -127,6 +126,7 @@ def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
             
         for successor, action, stepCost in problem.getSuccessors(state):
             if successor not in visited:
+                visited.add(successor)
                 queue.push((successor, path +[action]))
                 visited.add(successor)
     return []
