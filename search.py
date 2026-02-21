@@ -117,16 +117,18 @@ def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     start = problem.getStartState()
     queue.push((start,[]))
     visited = set()
+    visited.add(start)
 
     while not queue.isEmpty():
         state, path  = queue.pop()
+        
         if problem.isGoalState(state):
             return path
-        if state not in visited:
-            visited.add(state)
+            
         for successor, action, stepCost in problem.getSuccessors(state):
             if successor not in visited:
                 queue.push((successor, path +[action]))
+                visited.add(successor)
     return []
     util.raiseNotDefined()
 
