@@ -151,11 +151,11 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
 
     # Gets inital state and sets the fringe to be empty
     initialState = problem.getStartState()
-    fringe = []
+    fringe = util.PriorityQueue()
 
     # uses the heuristic function and gets an f(n) = priority. Then it pushes that f(n) + initialState and empty set which represents the actions to the fringe. 
     priority = heuristic(initialState, problem)
-    heapq.heappush(fringe, (priority, initialState, []))
+    fringe.push((initialState, []), priority)
 
     # Makes a dictionary of all the costs to keep in the memory for later
     bestG = {initialState : 0}
@@ -163,7 +163,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
     #While fringe is not empty
     while (fringe):
         #Strips the first priority node into the f(n), state, and the actions
-        priority, state, actions = heapq.heappop(fringe)
+        state, actions = fringe.pop()
     
         if problem.isGoalState(state):
             return actions #DONE!
@@ -182,7 +182,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
 
                 # priority = f(n) and push everything to the fringe for later
                 priority = successorG + heuristic(successorState, problem)
-                heapq.heappush(fringe, (priority, successorState, newActions))
+                fringe.push((successorState, newActions), priority)
     return []
 
         
