@@ -17,6 +17,8 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
+import heapq
+
 import util
 import heapq
 from game import Directions
@@ -34,7 +36,6 @@ class SearchProblem:
         """
         Returns the start state for the search problem.
         """
-        util.raiseNotDefined()
 
     def isGoalState(self, state):
         """
@@ -42,7 +43,6 @@ class SearchProblem:
 
         Returns True if and only if the state is a valid goal state.
         """
-        util.raiseNotDefined()
 
     def getSuccessors(self, state):
         """
@@ -53,7 +53,6 @@ class SearchProblem:
         state, 'action' is the action required to get there, and 'stepCost' is
         the incremental cost of expanding to that successor.
         """
-        util.raiseNotDefined()
 
     def getCostOfActions(self, actions):
         """
@@ -62,7 +61,6 @@ class SearchProblem:
         This method returns the total cost of a particular sequence of actions.
         The sequence must be composed of legal moves.
         """
-        util.raiseNotDefined()
 
 
 
@@ -109,8 +107,6 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
                 stack.push((successor, path + [action]))
     return []
 
-    util.raiseNotDefined()
-
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
@@ -121,24 +117,37 @@ def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
 
     while not queue.isEmpty():
         state, path  = queue.pop()
+        
         if problem.isGoalState(state):
             return path
-        if state not in visited:
-            visited.add(state)
+            
         for successor, action, stepCost in problem.getSuccessors(state):
             if successor not in visited:
                 visited.add(successor)
                 queue.push((successor, path +[action]))
     return []
-    util.raiseNotDefined()
 
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
+    queue = util.PriorityQueue()
+    start = problem.getStartState()
+    queue.push((start, [], 0), 0)
+    visited = set()
 
+    while not queue.isEmpty():
+        state, path, cost  = queue.pop()
+        if state in visited: 
+            continue
+        visited.add(state)
+        
+        if problem.isGoalState(state):
+            return path
+            
+        for successor, action, stepCost in problem.getSuccessors(state):
+            if successor not in visited:
+                queue.update((successor, path + [action], cost + stepCost), cost + stepCost)
+    return []
     
-    util.raiseNotDefined()
-
 def nullHeuristic(state, problem=None) -> float:
     """
     A heuristic function estimates the cost from the current state to the nearest
@@ -151,11 +160,11 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
 
     # Gets inital state and sets the fringe to be empty
     initialState = problem.getStartState()
-    fringe = util.PriorityQueue()
+    fringe = []
 
     # uses the heuristic function and gets an f(n) = priority. Then it pushes that f(n) + initialState and empty set which represents the actions to the fringe. 
     priority = heuristic(initialState, problem)
-    fringe.push((initialState, []), priority)
+    heapq.heappush(fringe, (priority, initialState, []))
 
     # Makes a dictionary of all the costs to keep in the memory for later
     bestG = {initialState : 0}
@@ -163,7 +172,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
     #While fringe is not empty
     while (fringe):
         #Strips the first priority node into the f(n), state, and the actions
-        state, actions = fringe.pop()
+        priority, state, actions = heapq.heappop(fringe)
     
         if problem.isGoalState(state):
             return actions #DONE!
@@ -182,7 +191,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
 
                 # priority = f(n) and push everything to the fringe for later
                 priority = successorG + heuristic(successorState, problem)
-                fringe.push((successorState, newActions), priority)
+                heapq.heappush(fringe, (priority, successorState, newActions))
     return []
 
         
